@@ -48,7 +48,7 @@ const Customizer = ({ tab, isFilterTab, isActiveTab, handleClick }) => {
     }
   }
 
-  const handleActiveFilterTab = () => {
+  const handleActiveFilterTab = (tabName) => {
     switch (tabName) {
       case "logoShirt":
         state.isLogoTexture = !activeFilterTab[tabName]
@@ -59,6 +59,13 @@ const Customizer = ({ tab, isFilterTab, isActiveTab, handleClick }) => {
         state.isLogoTexture = true
         state.isFullTexture = false
     }
+
+    setActiveFilterTab((prevState) => {
+      return {
+        ...prevState,
+        [tabName]: !prevState[tabName]
+      }
+    })
   }
 
   const readFile = (type) => {
