@@ -8,10 +8,66 @@ import { download } from '../assets'
 import { downloadCanvasToImage, reader } from '../config/helpers'
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants'
 import { fadeAnimation, slideAnimation } from '../config/motion'
-import { AIPicker, Tab, CustomButton } from '../components'
+import { AIPicker, Tab, CustomButton, ColorPicker, FilePicker } from '../components'
 
-const Customizer = () => {
+const Customizer = ({ tab, isFilterTab, isActiveTab, handleClick }) => {
   const snap = useSnapshot(state);
+  const [file, setFile] = React.useState('');
+  const [prompt, setPrompt] = React.useState('');
+  const [generatingImg, setGeneratingImg] = React.useState(false);
+  const [activeEditorTab, setActiveEditorTab] = React.useState('');
+  const [activeFilterTab, setActiveFilterTab] = React.useState({
+    logoShirt: true,
+    stylishShirt: false
+  })
+
+  const generateTabContent = () => {
+    switch (activeEditorTab) {
+      case 'colorpicker':
+        return <ColorPicker />
+      case 'filepicker':
+        return <FilePicker
+          file={file}
+          setFile={setFile}
+          readFile={readFile}
+        />
+      case 'aipicker':
+        return <AIPicker />
+      default:
+        return null;
+    }
+  }
+
+  const handleDecal = (type, res) => {
+    const decalType = DecalTypes[type]
+
+    state[decalType.stateProperty] = res
+
+    if (!isFilterTab[decalType.filterTab]) {
+      handleActiveFilterTab(decalType.filterTab)
+    }
+  }
+
+  const handleActiveFilterTab = () => {
+    switch (tabName) {
+      case "logoShirt":
+        state.isLogoTexture = !activeFilterTab[tabName]
+        break;
+      case 'stylishShirt':
+        state.isFullTexture = !activeFilterTab[tabName]
+      default:
+        state.isLogoTexture = true
+        state.isFullTexture = false
+    }
+  }
+
+  const readFile = (type) => {
+    reader(file)
+      .then(res => {
+        handleDecal(type, res)
+        setActiveEditorTab('')
+      })
+  }
 
   return (
     <AnimatePresence>
@@ -28,9 +84,10 @@ const Customizer = () => {
                   <Tab
                     key={tab.name}
                     tab={tab}
-                    handleClick={() => { }}
+                    handleClick={() => setActiveEditorTab(tab.name)}
                   />
                 ))}
+                {generateTabContent()}
               </div>
             </div>
           </motion.div>
@@ -52,8 +109,8 @@ const Customizer = () => {
                 key={tab.name}
                 tab={tab}
                 isFilterTab
-                isActiveTab=""
-                handleClick={() => { }}
+                isActiveTab={activeFilterTab[tab.name]}
+                handleClick={() => handleActiveFilterTab(tab.name)}
               />
             ))}
           </motion.div>

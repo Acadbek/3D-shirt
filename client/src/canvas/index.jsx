@@ -19,7 +19,7 @@ const CanvasModel = () => {
       <CameraRig>
         <Backdrop />
         <Center>
-          <Shirt />
+          <Shirt /> 
         </Center>
       </CameraRig>
     </Canvas>
